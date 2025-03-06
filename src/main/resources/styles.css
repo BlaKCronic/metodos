@@ -1,0 +1,60 @@
+.root {
+    -fx-font-family: 'Segoe UI';
+    -fx-background-color: linear-gradient(to bottom right, #f0f0f0, #ffffff);
+}
+
+.menu-btn {
+    -fx-background-color: #0078d4;
+    -fx-text-fill: white;
+    -fx-padding: 10 20;
+    -fx-background-radius: 5;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);
+    -fx-cursor: hand;
+    -fx-transition: all 0.3s;
+}
+
+.menu-btn:hover {
+    -fx-background-color: #006cbd;
+    -fx-translate-y: -2;
+}
+
+.table-view {
+    -fx-background-color: rgba(255,255,255,0.9);
+    -fx-background-radius: 5;
+    -fx-padding: 10;
+}
+
+.text-field {
+    -fx-background-radius: 5;
+    -fx-border-color: #cccccc;
+    -fx-border-radius: 5;
+}
+
+.alert {
+    -fx-background-color: rgba(255,255,255,0.95);
+    -fx-background-radius: 10;
+}
+
+.chart {
+    -fx-background-color: rgba(255,255,255,0.9);
+    -fx-background-radius: 10;
+    -fx-padding: 15;
+}
+
+.keyboard-button {
+    -fx-background-color: #f0f0f0;
+    -fx-border-color: #cccccc;
+    -fx-border-radius: 3;
+    -fx-padding: 8 12;
+    -fx-cursor: hand;
+    -fx-font-size: 14;
+}
+
+.keyboard-button:hover {
+    -fx-background-color: #e0e0e0;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 2, 0, 0, 1);
+}
+
+.function-button {
+    -fx-background-color: #d0e8ff;
+}
