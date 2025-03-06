@@ -64,17 +64,20 @@ public class SecantMethodController {
 
         calculateBtn.setOnAction(e -> {
             try {
+                validateEmptyFields(equationField, x0Field, x1Field, toleranceField, maxIterationsField);
                 updateChart(equationField.getText());
                 performSecantMethod(
                         equationField.getText(),
-                        Double.parseDouble(x0Field.getText()),
-                        Double.parseDouble(x1Field.getText()),
-                        Double.parseDouble(toleranceField.getText()),
-                        Integer.parseInt(maxIterationsField.getText()),
+                        parseDouble(x0Field.getText(), "Xi-1"),
+                        parseDouble(x1Field.getText(), "Xi"),
+                        parseDouble(toleranceField.getText(), "Tolerancia"),
+                        parseInt(maxIterationsField.getText(), "Iteraciones"),
                         table
                 );
+            } catch (IllegalArgumentException ex) {
+                showAlert(ex.getMessage());
             } catch (Exception ex) {
-                showAlert("Error en los datos de entrada");
+                showAlert("Error inesperado: " + ex.getMessage());
             }
         });
 
@@ -97,6 +100,10 @@ public class SecantMethodController {
     private void updateChart(String equation) {
         functionSeries.getData().clear();
         try {
+            if (equation.isEmpty()) {
+                throw new IllegalArgumentException("La ecuación no puede estar vacía");
+            }
+
             Expression expr = new ExpressionBuilder(equation)
                     .variable("x")
                     .build();
@@ -110,7 +117,8 @@ public class SecantMethodController {
                 }
             }
         } catch (Exception e) {
-            showAlert("Error al graficar la ecuación");
+            functionSeries.getData().add(new XYChart.Data<>(0, 0));
+            showAlert("Error en la gráfica: " + e.getMessage());
         }
     }
 
@@ -148,26 +156,30 @@ public class SecantMethodController {
     }
 
     private void handleButtonAction(String text) {
-        String current = equationField.getText();
+        try {
+            String current = equationField.getText();
 
-        switch (text) {
-            case "←":
-                if (!current.isEmpty()) {
-                    equationField.setText(current.substring(0, current.length() - 1));
-                }
-                break;
-            case "C":
-                equationField.clear();
-                break;
-            case "π":
-                equationField.setText(current + Math.PI);
-                break;
-            case "e":
-                equationField.setText(current + Math.E);
-                break;
-            default:
-                equationField.setText(current + text);
-                break;
+            switch (text) {
+                case "←":
+                    if (!current.isEmpty()) {
+                        equationField.setText(current.substring(0, current.length() - 1));
+                    }
+                    break;
+                case "C":
+                    equationField.clear();
+                    break;
+                case "π":
+                    equationField.setText(current + Math.PI);
+                    break;
+                case "e":
+                    equationField.setText(current + Math.E);
+                    break;
+                default:
+                    equationField.setText(current + text);
+                    break;
+            }
+        } catch (Exception e) {
+            showAlert("Error en la entrada: " + e.getMessage());
         }
     }
 
@@ -188,11 +200,17 @@ public class SecantMethodController {
         ObservableList<List<String>> data = FXCollections.observableArrayList();
 
         try {
+            if (equation.isEmpty()) {
+                throw new IllegalArgumentException("La ecuación no puede estar vacía");
+            }
+
             Expression expr = new ExpressionBuilder(equation)
                     .variable("x")
                     .build()
                     .setVariable("π", Math.PI)
                     .setVariable("e", Math.E);
+
+            validateInputValues(x0, x1, tolerance, maxIterations);
 
             double xiPrev = x0;
             double xi = x1;
@@ -224,8 +242,12 @@ public class SecantMethodController {
             }
 
             table.setItems(data);
-        } catch (Exception e) {
-            showAlert("Error en la ecuación: " + e.getMessage());
+        } catch (IllegalArgumentException ex) {
+            showAlert("Error de entrada: " + ex.getMessage());
+        } catch (ArithmeticException ex) {
+            showAlert("Error matemático: " + ex.getMessage());
+        } catch (Exception ex) {
+            showAlert("Error inesperado: " + ex.getMessage());
         }
     }
 
@@ -255,5 +277,43 @@ public class SecantMethodController {
             grid.add(fields[i], 1, i);
         }
         return grid;
+    }
+
+    private void validateEmptyFields(TextField... fields) {
+        for (TextField field : fields) {
+            if (field.getText().isEmpty()) {
+                throw new IllegalArgumentException("Todos los campos deben estar completos");
+            }
+        }
+    }
+
+    private double parseDouble(String value, String fieldName) {
+        try {
+            return Double.parseDouble(value);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Valor inválido para " + fieldName + ": " + value);
+        }
+    }
+
+    private int parseInt(String value, String fieldName) {
+        try {
+            return Integer.parseInt(value);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Valor inválido para " + fieldName + ": " + value);
+        }
+    }
+
+    private void validateInputValues(double x0, double x1, double tolerance, int maxIterations) {
+        if (Double.isNaN(x0) || Double.isNaN(x1)) {
+            throw new IllegalArgumentException("Los valores iniciales deben ser números válidos");
+        }
+
+        if (tolerance <= 0) {
+            throw new IllegalArgumentException("La tolerancia debe ser mayor que cero");
+        }
+
+        if (maxIterations <= 0) {
+            throw new IllegalArgumentException("El número máximo de iteraciones debe ser mayor que cero");
+        }
     }
 }
