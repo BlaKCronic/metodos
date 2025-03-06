@@ -28,7 +28,7 @@ public class SplashController {
             Text title = new Text("Métodos Numéricos");
             title.setFont(Font.font(24));
 
-            Text members = new Text("Integrantes:\nPonce Gonzalez Christian\nCruz Cruz Alejandro\nKarim");
+            Text members = new Text("Integrantes:\nPonce Gonzalez Christian\nCruz Cruz Alejandro\nKarim Gadiel Rios Rojas\nMartinez Cortez Irving\nMalagon Ortiz Emilio");
             members.setTextAlignment(javafx.scene.text.TextAlignment.CENTER);
 
             Button startBtn = new Button("Iniciar");
