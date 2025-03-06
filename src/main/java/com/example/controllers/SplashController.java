@@ -38,7 +38,7 @@ public class SplashController {
             });
 
             // Animaciones
-            startBtn.setOnMouseEntered(e -> animateButton(startBtn, 1.05));
+            startBtn.setOnMouseEntered(e -> animateButton(startBtn, 1.10));
             startBtn.setOnMouseExited(e -> animateButton(startBtn, 1.0));
 
             root.getChildren().addAll(title, members, startBtn);
