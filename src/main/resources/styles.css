@@ -228,3 +228,19 @@
     -fx-border-color: #e0e0e0;
     -fx-border-width: 0.5;
 }
+
+.result-label {
+    -fx-font-weight: bold;
+    -fx-text-fill: #2E3440;
+}
+
+.result-field {
+    -fx-background-color: #f8f9fa;
+    -fx-border-color: #4C566A;
+    -fx-border-radius: 3px;
+    -fx-padding: 5px;
+}
+
+.result-field:hover {
+    -fx-background-color: #e9ecef;
+}

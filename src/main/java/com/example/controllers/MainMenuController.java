@@ -23,8 +23,11 @@ public class MainMenuController {
             Button secantBtn = createMethodButton("Método de la Secante");
             secantBtn.setOnAction(e -> new SecantMethodController().show());
 
+            Button gaussBtn = createMethodButton("Método de Gauss");
+            gaussBtn.setOnAction(e -> new GaussMethodController().show());
+
             // Agregar más botones para otros métodos
-            root.getChildren().addAll(secantBtn);
+            root.getChildren().addAll(secantBtn, gaussBtn);
 
             Scene scene = new Scene(root, 400, 300);
             scene.getStylesheets().add(getClass().getResource("/styles.css").toExternalForm());
