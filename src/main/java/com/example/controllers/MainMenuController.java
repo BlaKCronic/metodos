@@ -26,6 +26,12 @@ public class MainMenuController {
             Button gaussBtn = createMethodButton("Método de Gauss");
             gaussBtn.setOnAction(e -> new GaussMethodController().show());
 
+            Button biseBtn = createMethodButton("Método de Biseccion");
+            biseBtn.setOnAction(e -> new BisectionMethodController().show());
+
+            Button jacoBtn = createMethodButton("Método de Jacobi");
+            jacoBtn.setOnAction(e -> new JacobiMethodController().show());
+
             // Agregar más botones para otros métodos
             root.getChildren().addAll(secantBtn, gaussBtn);
 
