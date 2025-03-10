@@ -25,146 +25,96 @@ public class SecantMethodController {
 
     public void show() {
         Stage mainStage = new Stage();
-        mainStage.setTitle("Método de la Secante");
+        mainStage.setTitle("Método de la Secante - Análisis Numérico");
 
+        // Configuración principal del layout
         SplitPane mainSplitPane = new SplitPane();
-        mainSplitPane.setDividerPositions(0.65);
+        mainSplitPane.setDividerPositions(0.58);
+        mainSplitPane.getStyleClass().add("main-container");
 
-        // Sección izquierda (controles y resultados)
-        VBox leftSection = new VBox(10);
-        leftSection.setPadding(new Insets(15));
-
-        // Componentes de entrada
-        HBox equationBox = new HBox(10);
-        equationField = new TextField();
-        equationField.setPromptText("Ingrese la función (ej: x^2 - 4)");
+        // Panel izquierdo: Controles y resultados
+        VBox controlPanel = createControlPanel();
         
-        Button exampleBtn = new Button("Ejemplo");
-        exampleBtn.getStyleClass().add("example-button");
-        exampleBtn.setOnAction(e -> loadExample());
-        
-        equationBox.getChildren().addAll(equationField, exampleBtn);
+        // Panel derecho: Teoría y explicación
+        VBox theoryPanel = createTheoryPanel();
 
-        // Teclado matemático
-        GridPane mathKeyboard = createMathKeyboard();
-        
-        TextField x0Field = new TextField();
-        x0Field.setPromptText("Xi-1 inicial (ej: 2)");
-        TextField x1Field = new TextField();
-        x1Field.setPromptText("Xi inicial (ej: 3)");
-        TextField toleranceField = new TextField();
-        toleranceField.setPromptText("Tolerancia (ej: 0.0001)");
+        mainSplitPane.getItems().addAll(controlPanel, theoryPanel);
 
-        Button calculateBtn = new Button("Calcular");
-        calculateBtn.getStyleClass().add("calculate-btn");
-        
-        Button showGraphBtn = new Button("Mostrar Gráfica");
-        showGraphBtn.getStyleClass().add("graph-btn");
-        showGraphBtn.setDisable(true);
-        
-        TableView<List<String>> table = createTable();
-        
-        // Resultado final
-        HBox resultBox = new HBox(10);
-        resultField = new TextField();
-        resultField.setEditable(false);
-        resultField.getStyleClass().add("result-field");
-        resultBox.getChildren().addAll(new Label("Raíz aproximada:"), resultField);
-
-        // Organizar sección izquierda
-        leftSection.getChildren().addAll(
-                createInputForm(equationBox, x0Field, x1Field, toleranceField),
-                mathKeyboard,
-                calculateBtn,
-                table,
-                resultBox,
-                showGraphBtn
-        );
-
-        // Sección derecha (descripción del método)
-        VBox rightSection = new VBox(10);
-        rightSection.setPadding(new Insets(5));
-        rightSection.setStyle("-fx-background-color: #f8f9fa;");
-
-        Label title = new Label("Teoría del Método de la Secante");
-        title.setStyle("-fx-font-size: 18; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
-
-        TextArea description = new TextArea(
-            "En análisis numérico el método de la secante es un método para encontrar los ceros\n" +
-            "de una función de forma iterativa.\n\n" +
-            
-            "Es una variación del método de Newton-Raphson donde en vez de calcular la derivada\n" +
-            "de la función en el punto de estudio, se aproxima la pendiente a la recta que une\n" + 
-            "la función evaluada en el punto de estudio y en el punto de la iteración anterior.\n\n" +
-            
-            "Fórmula de aproximación:\n" +
-            "xₙ₊₁ = xₙ - f(xₙ) * (xₙ - xₙ₋₁) / (f(xₙ) - f(xₙ₋₁))\n\n" +
-            
-            "Características clave:\n" +
-            "• Alternativa al método de Newton-Raphson\n" +
-            "• Elimina necesidad de calcular derivadas\n" +
-            "• Coste computacional más bajo\n" +
-            "• Convergencia superlineal (orden 1.618)\n\n" +
-            
-            "Ventajas principales:\n" +
-            "- Ideal cuando la derivada es compleja/costosa\n" +
-            "- Más eficiente que métodos como bisección\n" +
-            "- Implementación relativamente simple\n\n" +
-            
-            "Consideraciones importantes:\n" +
-            "• Requiere dos aproximaciones iniciales\n" +
-            "• Sensible a la selección de puntos iniciales\n" +
-            "• Posible divergencia en funciones no suaves\n" +
-            "• Criterio de parada basado en tolerancia"
-        );
-        description.setEditable(false);
-        description.setWrapText(true);
-        description.setStyle("-fx-font-family: 'Segoe UI';" +
-                            "-fx-font-size: 13;" +
-                            "-fx-text-fill: #34495e;" +
-                            "-fx-background-color: transparent;" +
-                            "-fx-border-color: transparent;" +
-                            "-fx-pref-height: 600;"
-                            );
-
-        rightSection.getChildren().addAll(title, description);
-        mainSplitPane.getItems().addAll(leftSection, rightSection);
-
-        // Configurar eventos
-        calculateBtn.setOnAction(e -> {
-            try {
-                validateEmptyFields(equationField, x0Field, x1Field, toleranceField);
-                currentEquation = equationField.getText();
-                performSecantMethod(
-                        currentEquation,
-                        parseDouble(x0Field.getText(), "Xi-1"),
-                        parseDouble(x1Field.getText(), "Xi"),
-                        parseDouble(toleranceField.getText(), "Tolerancia"),
-                        table
-                );
-                showGraphBtn.setDisable(false);
-            } catch (IllegalArgumentException ex) {
-                showAlert(ex.getMessage());
-            } catch (Exception ex) {
-                showAlert("Error inesperado: " + ex.getMessage());
-            }
-        });
-
-        showGraphBtn.setOnAction(e -> {
-            if (!currentEquation.isEmpty()) {
-                showGraphWindow(currentEquation);
-            }
-        });
-
-        Scene scene = new Scene(mainSplitPane, 1300, 750);
+        // Configurar escena principal
+        Scene scene = new Scene(mainSplitPane, 1280, 720);
+        scene.getStylesheets().add(getClass().getResource("/styles.css").toExternalForm());
         mainStage.setScene(scene);
         mainStage.show();
     }
 
+    private VBox createControlPanel() {
+        VBox panel = new VBox(12);
+        panel.getStyleClass().add("control-panel");
+        panel.setPadding(new Insets(20));
+
+        // Sección de entrada de ecuación
+        HBox equationContainer = new HBox(10);
+        equationField = new TextField();
+        equationField.setPromptText("Ej: x^3 + 2*cos(x) - 5");
+        equationField.getStyleClass().add("equation-field");
+        
+        Button btnExample = new Button("Ejemplo");
+        btnExample.getStyleClass().add("example-btn");
+        btnExample.setOnAction(e -> loadExample());
+        
+        equationContainer.getChildren().addAll(equationField, btnExample);
+
+        // Teclado matemático interactivo
+        GridPane mathKeyboard = createMathKeyboard();
+
+        // Campos de entrada numéricos
+        GridPane inputGrid = createInputGrid();
+
+        // Botones principales
+        HBox buttonContainer = new HBox(10);
+        Button btnCalculate = new Button("Calcular");
+        btnCalculate.getStyleClass().add("calculate-btn");
+        
+        Button btnGraph = new Button("Mostrar Gráfica");
+        btnGraph.getStyleClass().add("graph-btn");
+        btnGraph.setDisable(true);
+
+        buttonContainer.getChildren().addAll(btnCalculate, btnGraph);
+
+        // Tabla de resultados
+        TableView<List<String>> resultsTable = createResultsTable();
+
+        // Resultado final
+        HBox resultContainer = new HBox(10);
+        resultField = new TextField();
+        resultField.setEditable(false);
+        resultField.getStyleClass().add("result-field");
+        resultContainer.getChildren().addAll(new Label("Raíz aproximada:"), resultField);
+
+        // Ensamblar panel
+        panel.getChildren().addAll(
+            new Label("Ingrese la función:"),
+            equationContainer,
+            mathKeyboard,
+            new Separator(),
+            inputGrid,
+            buttonContainer,
+            new Label("Proceso Iterativo:"),
+            resultsTable,
+            resultContainer
+        );
+
+        // Event handlers
+        btnCalculate.setOnAction(e -> handleCalculation(resultsTable, btnGraph));
+        btnGraph.setOnAction(e -> showGraphWindow());
+
+        return panel;
+    }
+
     private GridPane createMathKeyboard() {
         GridPane keyboard = new GridPane();
-        keyboard.setVgap(5);
-        keyboard.setHgap(5);
+        keyboard.setHgap(6);
+        keyboard.setVgap(6);
         keyboard.setPadding(new Insets(10));
 
         String[][] buttons = {
@@ -186,154 +136,124 @@ public class SecantMethodController {
 
     private Button createKeyboardButton(String text) {
         Button btn = new Button(text);
-        btn.getStyleClass().add("keyboard-button");
-        if (text.matches("[a-zA-Z]+")) btn.getStyleClass().add("function-button");
+        btn.getStyleClass().addAll("key-btn", 
+            text.matches("[+\\-*/^=]") ? "operator-key" : 
+            text.matches("[a-zA-Z]+") ? "function-key" : "number-key");
         
-        btn.setOnAction(e -> handleButtonAction(text));
+        btn.setOnAction(e -> handleKeyboardInput(text));
         return btn;
     }
 
-    private void handleButtonAction(String text) {
+    private void handleKeyboardInput(String key) {
         String current = equationField.getText();
-        switch (text) {
-            case "←":
-                if (!current.isEmpty()) {
-                    equationField.setText(current.substring(0, current.length() - 1));
-                }
+        switch (key) {
+            case "←": 
+                if (!current.isEmpty()) equationField.setText(current.substring(0, current.length()-1));
                 break;
-            case "C":
+            case "C": 
                 equationField.clear();
                 break;
-            case "π":
+            case "π": 
                 equationField.setText(current + Math.PI);
                 break;
-            case "e":
+            case "e": 
                 equationField.setText(current + Math.E);
                 break;
-            case "√(":
+            case "√(": 
                 equationField.setText(current + "sqrt(");
                 break;
-            default:
-                equationField.setText(current + text);
-                break;
+            default: 
+                equationField.setText(current + key);
         }
     }
 
-    private void loadExample() {
-        equationField.setText("x^2 - 4");
-    }
-
-    private void showGraphWindow(String equation) {
-        Stage graphStage = new Stage();
-        graphStage.setTitle("Gráfica de la Función");
-        
-        VBox root = new VBox(10);
-        root.setPadding(new Insets(15));
-
-        LineChart<Number, Number> chart = createChart(equation);
-        root.getChildren().addAll(chart);
-
-        Scene scene = new Scene(root, 600, 500);
-        graphStage.setScene(scene);
-        graphStage.show();
-    }
-
-    private LineChart<Number, Number> createChart(String equation) {
-        NumberAxis xAxis = new NumberAxis(-10, 10, 1);
-        NumberAxis yAxis = new NumberAxis(-10, 10, 1);
-        LineChart<Number, Number> chart = new LineChart<>(xAxis, yAxis);
-        chart.setTitle("Función: " + equation);
-        chart.setLegendVisible(false);
-        
-        // Configurar zoom y desplazamiento
-        chart.setAnimated(false);
-        final double[] xOffset = new double[1];
-        final double[] yOffset = new double[1];
-        
-        chart.setOnScroll(event -> {
-            double zoomFactor = 1.05;
-            if (event.getDeltaY() < 0) zoomFactor = 0.95;
-            
-            double xMin = xAxis.getLowerBound();
-            double xMax = xAxis.getUpperBound();
-            double yMin = yAxis.getLowerBound();
-            double yMax = yAxis.getUpperBound();
-            
-            double mouseX = event.getX();
-            double mouseY = event.getY();
-            
-            double xValue = xAxis.getValueForDisplay(mouseX).doubleValue();
-            double yValue = yAxis.getValueForDisplay(mouseY).doubleValue();
-            
-            xAxis.setLowerBound(xValue - (xValue - xMin) * zoomFactor);
-            xAxis.setUpperBound(xValue + (xMax - xValue) * zoomFactor);
-            yAxis.setLowerBound(yValue - (yValue - yMin) * zoomFactor);
-            yAxis.setUpperBound(yValue + (yMax - yValue) * zoomFactor);
-            
-            event.consume();
-        });
-        
-        chart.setOnMousePressed(event -> {
-            xOffset[0] = event.getX();
-            yOffset[0] = event.getY();
-        });
-        
-        chart.setOnMouseDragged(event -> {
-            double deltaX = (event.getX() - xOffset[0]) / chart.getWidth();
-            double deltaY = (event.getY() - yOffset[0]) / chart.getHeight();
-            
-            double xRange = xAxis.getUpperBound() - xAxis.getLowerBound();
-            double yRange = yAxis.getUpperBound() - yAxis.getLowerBound();
-            
-            xAxis.setLowerBound(xAxis.getLowerBound() - deltaX * xRange);
-            xAxis.setUpperBound(xAxis.getUpperBound() - deltaX * xRange);
-            yAxis.setLowerBound(yAxis.getLowerBound() + deltaY * yRange);
-            yAxis.setUpperBound(yAxis.getUpperBound() + deltaY * yRange);
-            
-            xOffset[0] = event.getX();
-            yOffset[0] = event.getY();
-            event.consume();
-        });
-
-        XYChart.Series<Number, Number> functionSeries = new XYChart.Series<>();
-        
-        try {
-            Expression expr = new ExpressionBuilder(equation)
-                    .variable("x")
-                    .build();
-
-            for (double x = -10; x <= 10; x += 0.1) {
-                try {
-                    double y = evaluate(expr, x);
-                    functionSeries.getData().add(new XYChart.Data<>(x, y));
-                } catch (ArithmeticException e) {
-                    // Ignorar puntos no válidos
-                }
-            }
-        } catch (Exception e) {
-            showAlert("Error al graficar: " + e.getMessage());
-        }
-        
-        chart.getData().add(functionSeries);
-        return chart;
-    }
-
-    private GridPane createInputForm(HBox equationBox, TextField... fields) {
+    private GridPane createInputGrid() {
         GridPane grid = new GridPane();
         grid.setHgap(10);
-        grid.setVgap(10);
-        grid.setPadding(new Insets(10));
+        grid.setVgap(12);
         
-        String[] labels = {"Ecuación", "Xi-1", "Xi", "Tolerancia"};
-
-        grid.add(new Label(labels[0]), 0, 0);
-        grid.add(equationBox, 1, 0);
+        TextField x0Field = new TextField();
+        TextField x1Field = new TextField();
+        TextField tolField = new TextField();
         
-        for (int i = 1; i < labels.length; i++) {
-            grid.add(new Label(labels[i]), 0, i);
-            grid.add(fields[i-1], 1, i);
-        }
+        x0Field.setPromptText("Xi-1 inicial");
+        x1Field.setPromptText("Xi inicial");
+        tolField.setPromptText("Tolerancia (1e-6)");
+        
+        grid.addRow(0, new Label("Valor inicial Xi-1:"), x0Field);
+        grid.addRow(1, new Label("Valor inicial Xi:"), x1Field);
+        grid.addRow(2, new Label("Tolerancia máxima:"), tolField);
+        
         return grid;
+    }
+
+    private TableView<List<String>> createResultsTable() {
+        TableView<List<String>> table = new TableView<>();
+        String[] columns = {"Iter", "Xi-1", "Xi", "f(Xi-1)", "f(Xi)", "Xi+1", "Error"};
+        
+        for (String col : columns) {
+            TableColumn<List<String>, String> column = new TableColumn<>(col);
+            column.setCellValueFactory(data -> new javafx.beans.property.SimpleStringProperty(
+                data.getValue().get(table.getColumns().indexOf(column))
+            ));
+            column.setPrefWidth(col.equals("Iter") ? 60 : 100);
+            table.getColumns().add(column);
+        }
+        table.setPrefHeight(350);
+        return table;
+    }
+
+    private VBox createTheoryPanel() {
+        VBox panel = new VBox(15);
+        panel.getStyleClass().add("theory-panel");
+        panel.setPadding(new Insets(25));
+
+        Label title = new Label("Fundamentos del Método");
+        title.getStyleClass().add("theory-title");
+
+        TextArea content = new TextArea(
+            "Método de la Secante\n\n" +
+            "Algoritmo iterativo para encontrar raíces de funciones continuas.\n\n" +
+            "Fórmula de iteración:\n" +
+            "xₙ₊₁ = xₙ - f(xₙ)[(xₙ - xₙ₋₁)/(f(xₙ) - f(xₙ₋₁))]\n\n" +
+            "Características clave:\n" +
+            "• Velocidad de convergencia: 1.618 (proporción áurea)\n" +
+            "• No requiere cálculo de derivadas\n" +
+            "• Necesita dos aproximaciones iniciales\n" +
+            "• Criterio de parada por error relativo\n\n" +
+            "Recomendaciones prácticas:\n" +
+            "- Usar valores iniciales cercanos a la raíz\n" +
+            "- Verificar continuidad en el intervalo\n" +
+            "- Tolerancia típica: 1e-5 a 1e-8\n" +
+            "- Límite de iteraciones: 100-200"
+        );
+        content.getStyleClass().add("theory-content");
+        
+        panel.getChildren().addAll(title, content);
+        return panel;
+    }
+
+    private void handleCalculation(TableView<List<String>> table, Button graphBtn) {
+        try {
+            TextField x0Field = (TextField) ((GridPane) table.getParent().getChildrenUnmodifiable().get(4)).getChildren().get(1);
+            TextField x1Field = (TextField) ((GridPane) table.getParent().getChildrenUnmodifiable().get(4)).getChildren().get(3);
+            TextField tolField = (TextField) ((GridPane) table.getParent().getChildrenUnmodifiable().get(4)).getChildren().get(5);
+
+            validateInputs(x0Field, x1Field, tolField);
+            currentEquation = equationField.getText();
+            
+            performSecantMethod(
+                currentEquation,
+                parseDouble(x0Field.getText()),
+                parseDouble(x1Field.getText()),
+                parseDouble(tolField.getText()),
+                table
+            );
+            
+            graphBtn.setDisable(false);
+        } catch (Exception e) {
+            showErrorDialog("Error de entrada", e.getMessage());
+        }
     }
 
     private void performSecantMethod(String equation, double x0, double x1, double tolerance, TableView<List<String>> table) {
@@ -342,59 +262,92 @@ public class SecantMethodController {
 
         try {
             Expression expr = new ExpressionBuilder(equation)
-                    .variable("x")
-                    .build()
-                    .setVariable("π", Math.PI)
-                    .setVariable("e", Math.E);
-
-            validateInputValues(x0, x1, tolerance);
+                .variable("x")
+                .build()
+                .setVariable("π", Math.PI)
+                .setVariable("e", Math.E);
 
             double xiPrev = x0;
             double xi = x1;
-            double finalRoot = Double.NaN;
-            boolean converged = false;
-            int iteration = 0;
-            final int MAX_SAFE_ITERATIONS = 1000;
+            double root = Double.NaN;
+            int iter = 0;
+            final int MAX_ITER = 200;
 
-            while (!converged && iteration < MAX_SAFE_ITERATIONS) {
-                double fxiPrev = evaluate(expr, xiPrev);
-                double fxi = evaluate(expr, xi);
-
-                if (Math.abs(fxiPrev - fxi) < 1e-12) break;
-
-                double xiPlus1 = xi - (fxi * (xiPrev - xi)) / (fxiPrev - fxi);
+            while (iter < MAX_ITER) {
+                double fPrev = evaluate(expr, xiPrev);
+                double fCurrent = evaluate(expr, xi);
+                
+                if (Math.abs(fCurrent - fPrev) < 1e-15) break;
+                
+                double xiPlus1 = xi - fCurrent * (xi - xiPrev) / (fCurrent - fPrev);
                 double error = Math.abs((xiPlus1 - xi) / xiPlus1);
-
-                List<String> row = new ArrayList<>();
-                row.add(roundSixDecimals(xiPrev));
-                row.add(roundSixDecimals(xi));
-                row.add(roundSixDecimals(fxiPrev));
-                row.add(roundSixDecimals(fxi));
-                row.add(roundSixDecimals(xiPlus1));
-                row.add(roundSixDecimals(error));
-                data.add(row);
-
+                
+                data.add(createTableRow(iter+1, xiPrev, xi, fPrev, fCurrent, xiPlus1, error));
+                
                 if (error < tolerance) {
-                    finalRoot = xiPlus1;
-                    converged = true;
+                    root = xiPlus1;
+                    break;
                 }
-
+                
                 xiPrev = xi;
                 xi = xiPlus1;
-                iteration++;
+                iter++;
             }
 
             table.setItems(data);
+            resultField.setText(iter < MAX_ITER ? df.format(root) : "No converge en " + iter + " iteraciones");
             
-            if (!Double.isNaN(finalRoot)) {
-                resultField.setText(roundSixDecimals(finalRoot));
-            } else {
-                resultField.setText("No convergió en " + iteration + " iteraciones");
-            }
-
-        } catch (Exception ex) {
-            showAlert("Error: " + ex.getMessage());
+        } catch (Exception e) {
+            showErrorDialog("Error de cálculo", e.getMessage());
         }
+    }
+
+    private List<String> createTableRow(int iter, double... values) {
+        List<String> row = new ArrayList<>();
+        row.add(String.valueOf(iter));
+        for (double val : values) row.add(df.format(val));
+        return row;
+    }
+
+    private void showGraphWindow() {
+        Stage graphStage = new Stage();
+        graphStage.setTitle("Análisis Gráfico: " + currentEquation);
+
+        LineChart<Number, Number> chart = createChart(currentEquation);
+        chart.getStyleClass().add("chart-container");
+
+        ScrollPane scroll = new ScrollPane(chart);
+        scroll.setFitToWidth(true);
+        scroll.setFitToHeight(true);
+
+        Scene scene = new Scene(scroll, 800, 600);
+        scene.getStylesheets().add(getClass().getResource("/styles.css").toExternalForm());
+        graphStage.setScene(scene);
+        graphStage.show();
+    }
+
+    private LineChart<Number, Number> createChart(String equation) {
+        NumberAxis xAxis = new NumberAxis(-10, 10, 1);
+        NumberAxis yAxis = new NumberAxis(-10, 10, 1);
+        LineChart<Number, Number> chart = new LineChart<>(xAxis, yAxis);
+        
+        XYChart.Series<Number, Number> series = new XYChart.Series<>();
+        series.setName("f(x) = " + equation);
+
+        try {
+            Expression expr = new ExpressionBuilder(equation).variable("x").build();
+            for (double x = -9.5; x <= 10; x += 0.15) {
+                try {
+                    double y = expr.setVariable("x", x).evaluate();
+                    series.getData().add(new XYChart.Data<>(x, y));
+                } catch (ArithmeticException e) { /* Ignorar puntos inválidos */ }
+            }
+        } catch (Exception e) {
+            showErrorDialog("Error gráfico", "No se puede graficar la función");
+        }
+        
+        chart.getData().add(series);
+        return chart;
     }
 
     private double evaluate(Expression expr, double x) {
@@ -402,53 +355,31 @@ public class SecantMethodController {
         return expr.evaluate();
     }
 
-    private String roundSixDecimals(double value) {
-        return String.format("%.6f", Math.round(value * 1e6) / 1e6);
+    private void validateInputs(TextField... fields) throws IllegalArgumentException {
+        for (TextField field : fields) {
+            if (field.getText().isBlank()) {
+                throw new IllegalArgumentException("Complete todos los campos requeridos");
+            }
+        }
     }
 
-    private void showAlert(String message) {
+    private double parseDouble(String text) throws NumberFormatException {
+        try {
+            return Double.parseDouble(text);
+        } catch (NumberFormatException e) {
+            throw new NumberFormatException("Valor numérico inválido: " + text);
+        }
+    }
+
+    private void showErrorDialog(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
     }
 
-    private void validateEmptyFields(TextField... fields) {
-        for (TextField field : fields) {
-            if (field.getText().isEmpty()) {
-                throw new IllegalArgumentException("Todos los campos deben estar completos");
-            }
-        }
-    }
-
-    private double parseDouble(String value, String fieldName) {
-        try {
-            return Double.parseDouble(value);
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Valor inválido para " + fieldName + ": " + value);
-        }
-    }
-
-    private void validateInputValues(double x0, double x1, double tolerance) {
-        if (Double.isNaN(x0) || Double.isNaN(x1)) {
-            throw new IllegalArgumentException("Valores iniciales inválidos");
-        }
-        if (tolerance <= 0) {
-            throw new IllegalArgumentException("La tolerancia debe ser mayor que cero");
-        }
-    }
-
-    private TableView<List<String>> createTable() {
-        TableView<List<String>> table = new TableView<>();
-        String[] columns = {"Xi-1", "Xi", "f(Xi-1)", "f(Xi)", "Xi+1", "Error"};
-
-        for (int i = 0; i < columns.length; i++) {
-            TableColumn<List<String>, String> col = new TableColumn<>(columns[i]);
-            final int colIndex = i;
-            col.setCellValueFactory(data -> new javafx.beans.property.SimpleStringProperty(data.getValue().get(colIndex)));
-            col.setPrefWidth(120);
-            table.getColumns().add(col);
-        }
-        return table;
+    private void loadExample() {
+        equationField.setText("x^3 - 2*x - 5");
     }
 }

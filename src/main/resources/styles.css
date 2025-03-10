@@ -1,79 +1,230 @@
+/* styles.css */
+
+/* Estilos base y全局设置 */
 .root {
-    -fx-font-family: 'Segoe UI';
-    -fx-background-color: linear-gradient(to bottom right, #f0f0f0, #ffffff);
+    -fx-font-family: 'Segoe UI Variable';
+    -fx-base: #f3f3f3;
+    -fx-background: #fafafa;
+    -fx-accent: #1a73e8;
+    -fx-focus-color: transparent;
 }
 
-.menu-btn {
-    -fx-background-color: #0078d4;
-    -fx-text-fill: white;
-    -fx-padding: 10 20;
-    -fx-background-radius: 5;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);
-    -fx-cursor: hand;
-    -fx-transition: all 0.3s;
+/* SplitPane y divisores */
+.split-pane {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
 }
 
-.menu-btn:hover {
-    -fx-background-color: #006cbd;
-    -fx-translate-y: -2;
+.split-pane-divider {
+    -fx-background-color: rgba(0,0,0,0.08);
+    -fx-padding: 0 2 0 2;
 }
 
-.table-view {
-    -fx-background-color: rgba(255,255,255,0.9);
-    -fx-background-radius: 5;
-    -fx-padding: 10;
+/* Panel izquierdo - Controles */
+.control-panel {
+    -fx-background-color: rgba(255,255,255,0.85);
+    -fx-background-radius: 8;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 12, 0, 0, 2);
+    -fx-padding: 20;
+    -fx-spacing: 12;
 }
 
-.text-field {
-    -fx-background-radius: 5;
-    -fx-border-color: #cccccc;
-    -fx-border-radius: 5;
+/* Panel derecho - Teoría */
+.theory-panel {
+    -fx-background-color: rgba(255,255,255,0.78);
+    -fx-background-radius: 8;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 10, 0, 0, 2);
+    -fx-border-radius: 8;
+    -fx-border-color: rgba(0,0,0,0.05);
+    -fx-border-width: 1;
 }
 
-.alert {
-    -fx-background-color: rgba(255,255,255,0.95);
-    -fx-background-radius: 10;
+/* Títulos */
+.theory-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #202124;
+    -fx-padding: 0 0 12px 0;
 }
 
-.chart {
-    -fx-background-color: rgba(255,255,255,0.9);
-    -fx-background-radius: 10;
-    -fx-padding: 15;
+/* Contenido teórico */
+.theory-content {
+    -fx-font-size: 13.5px;
+    -fx-text-fill: #444746;
+    -fx-line-spacing: 1.5em;
+    -fx-padding: 8;
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-pref-height: 800;
 }
 
-.keyboard-button {
-    -fx-background-color: #f0f0f0;
-    -fx-border-color: #cccccc;
-    -fx-border-radius: 3;
+/* Campos de texto */
+.modern-textfield {
+    -fx-background-radius: 6;
+    -fx-border-radius: 6;
+    -fx-border-color: #e0e0e0;
     -fx-padding: 8 12;
+    -fx-font-size: 13.5px;
+    -fx-pref-width: 280px;
+}
+
+.modern-textfield:focused {
+    -fx-border-color: #1a73e8;
+    -fx-effect: dropshadow(gaussian, rgba(26,115,232,0.15), 8, 0, 0, 2);
+}
+
+/* Botones */
+.button {
+    -fx-background-radius: 6;
+    -fx-border-radius: 6;
+    -fx-padding: 8 16;
+    -fx-font-size: 10.5px;
     -fx-cursor: hand;
-    -fx-font-size: 14;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.03), 4, 0, 0, 1);
+    -fx-background-color: linear-gradient(to bottom, #ffffff, #f8f9fa);
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 1;
 }
 
-.keyboard-button:hover {
-    -fx-background-color: #e0e0e0;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 2, 0, 0, 1);
+.button:hover {
+    -fx-background-color: linear-gradient(to bottom, #ffffff, #f1f3f4);
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 6, 0, 0, 2);
 }
 
-.function-button {
-    -fx-background-color: #d0e8ff;
+.example-button {
+    -fx-background-color: #e8f0fe;
+    -fx-text-fill: #1a73e8;
+    -fx-border-color: #cbdbf3;
 }
 
-.alert.dialog-pane {
-    -fx-background-color: rgba(255,255,255,0.95);
+.calculate-button {
+    -fx-background-color: #1a73e8;
+    -fx-text-fill: white;
+    -fx-font-weight: 600;
+    -fx-border-color: #1657b0;
+}
+
+.graph-button {
+    -fx-background-color: #34a853;
+    -fx-text-fill: white;
+    -fx-border-color: #2b9147;
+}
+
+/* Tabla de resultados */
+.table-view {
+    -fx-background-radius: 6;
+    -fx-border-radius: 6;
+    -fx-border-color: #e0e0e0;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.03), 4, 0, 0, 1);
+    -fx-pref-height: 400px;
+}
+
+.table-column {
+    -fx-alignment: CENTER-RIGHT;
+    -fx-font-size: 13px;
+}
+
+.column-header {
+    -fx-background-color: #f8f9fa;
+    -fx-border-color: #e0e0e0;
+    -fx-font-weight: 500;
+    -fx-text-fill: #5f6368;
+}
+
+.table-row-cell:odd {
+    -fx-background-color: #fafafa;
+}
+
+.table-row-cell:selected {
+    -fx-background-color: #e8f0fe;
+}
+
+/* Teclado matemático */
+.keyboard-button {
+    -fx-background-radius: 4;
+    -fx-border-radius: 4;
+    -fx-padding: 10 12;
+    -fx-font-size: 13px;
+    -fx-min-width: 30px;
+    -fx-min-height: 20px;
+}
+
+.number-key {
+    -fx-background-color: #f8f9fa;
+    -fx-text-fill: #202124;
+    -fx-border-color: #e0e0e0;
+}
+
+.operator-key {
+    -fx-background-color: #f1f3f4;
+    -fx-text-fill: #1a73e8;
+    -fx-font-weight: 500;
+}
+
+.function-key {
+    -fx-background-color: #e8f0fe;
+    -fx-text-fill: #1a73e8;
+    -fx-font-weight: 500;
+}
+
+/* Campo de resultado */
+.result-field {
+    -fx-background-color: #e8f0fe;
+    -fx-background-radius: 6;
+    -fx-padding: 10 14;
+    -fx-font-size: 14px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #1a73e8;
+    -fx-effect: dropshadow(gaussian, rgba(26,115,232,0.1), 0, 0, 0, 1);
+}
+
+/* Gráfica */
+.chart-container {
+    -fx-background-color: white;
+    -fx-background-radius: 8;
+    -fx-padding: 20;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 8, 0, 0, 2);
+}
+
+.chart-title {
+    -fx-font-size: 15px;
+    -fx-text-fill: #202124;
+}
+
+.axis {
+    -fx-tick-label-fill: #5f6368;
+    -fx-font-size: 12px;
+    -fx-tick-mark-visible: false;
+}
+
+.chart-series-line {
+    -fx-stroke: #1a73e8;
+    -fx-stroke-width: 1.8;
+    -fx-effect: dropshadow(gaussian, rgba(26,115,232,0.2), 8, 0.3, 0, 0);
+}
+
+/* Alertas y diálogos */
+.dialog-pane {
+    -fx-background-color: white;
+    -fx-background-radius: 8;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);
+}
+
+.alert.error {
+    -fx-graphic: url('error-icon.png');
 }
 
 .alert .content {
-    -fx-font-size: 14px;
-    -fx-padding: 10px;
+    -fx-font-size: 13.5px;
+    -fx-text-fill: #5f6368;
 }
 
-.dialog-pane .button {
-    -fx-background-color: #0078d4;
-    -fx-text-fill: white;
-    -fx-background-radius: 3;
+/* Separadores */
+.separator {
+    -fx-padding: 12 0;
 }
 
-.dialog-pane .button:hover {
-    -fx-background-color: #006cbd;
+.separator .line {
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 0.5;
 }
