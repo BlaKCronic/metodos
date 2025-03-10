@@ -27,12 +27,13 @@ public class SecantMethodController {
         Stage mainStage = new Stage();
         mainStage.setTitle("Método de la Secante");
 
-        VBox root = new VBox(10);
-        root.setPadding(new Insets(15));
+        SplitPane mainSplitPane = new SplitPane();
+        mainSplitPane.setDividerPositions(0.65);
 
-        // Componentes principales
-        VBox inputSection = new VBox(10);
-        
+        // Sección izquierda (controles y resultados)
+        VBox leftSection = new VBox(10);
+        leftSection.setPadding(new Insets(15));
+
         // Componentes de entrada
         HBox equationBox = new HBox(10);
         equationField = new TextField();
@@ -70,8 +71,8 @@ public class SecantMethodController {
         resultField.getStyleClass().add("result-field");
         resultBox.getChildren().addAll(new Label("Raíz aproximada:"), resultField);
 
-        // Organizar sección de entrada
-        inputSection.getChildren().addAll(
+        // Organizar sección izquierda
+        leftSection.getChildren().addAll(
                 createInputForm(equationBox, x0Field, x1Field, toleranceField),
                 mathKeyboard,
                 calculateBtn,
@@ -80,8 +81,56 @@ public class SecantMethodController {
                 showGraphBtn
         );
 
-        root.getChildren().add(inputSection);
+        // Sección derecha (descripción del método)
+        VBox rightSection = new VBox(10);
+        rightSection.setPadding(new Insets(5));
+        rightSection.setStyle("-fx-background-color: #f8f9fa;");
 
+        Label title = new Label("Teoría del Método de la Secante");
+        title.setStyle("-fx-font-size: 18; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+
+        TextArea description = new TextArea(
+            "En análisis numérico el método de la secante es un método para encontrar los ceros\n" +
+            "de una función de forma iterativa.\n\n" +
+            
+            "Es una variación del método de Newton-Raphson donde en vez de calcular la derivada\n" +
+            "de la función en el punto de estudio, se aproxima la pendiente a la recta que une\n" + 
+            "la función evaluada en el punto de estudio y en el punto de la iteración anterior.\n\n" +
+            
+            "Fórmula de aproximación:\n" +
+            "xₙ₊₁ = xₙ - f(xₙ) * (xₙ - xₙ₋₁) / (f(xₙ) - f(xₙ₋₁))\n\n" +
+            
+            "Características clave:\n" +
+            "• Alternativa al método de Newton-Raphson\n" +
+            "• Elimina necesidad de calcular derivadas\n" +
+            "• Coste computacional más bajo\n" +
+            "• Convergencia superlineal (orden 1.618)\n\n" +
+            
+            "Ventajas principales:\n" +
+            "- Ideal cuando la derivada es compleja/costosa\n" +
+            "- Más eficiente que métodos como bisección\n" +
+            "- Implementación relativamente simple\n\n" +
+            
+            "Consideraciones importantes:\n" +
+            "• Requiere dos aproximaciones iniciales\n" +
+            "• Sensible a la selección de puntos iniciales\n" +
+            "• Posible divergencia en funciones no suaves\n" +
+            "• Criterio de parada basado en tolerancia"
+        );
+        description.setEditable(false);
+        description.setWrapText(true);
+        description.setStyle("-fx-font-family: 'Segoe UI';" +
+                            "-fx-font-size: 13;" +
+                            "-fx-text-fill: #34495e;" +
+                            "-fx-background-color: transparent;" +
+                            "-fx-border-color: transparent;" +
+                            "-fx-pref-height: 600;"
+                            );
+
+        rightSection.getChildren().addAll(title, description);
+        mainSplitPane.getItems().addAll(leftSection, rightSection);
+
+        // Configurar eventos
         calculateBtn.setOnAction(e -> {
             try {
                 validateEmptyFields(equationField, x0Field, x1Field, toleranceField);
@@ -107,7 +156,7 @@ public class SecantMethodController {
             }
         });
 
-        Scene scene = new Scene(root, 900, 700);
+        Scene scene = new Scene(mainSplitPane, 1300, 750);
         mainStage.setScene(scene);
         mainStage.show();
     }
@@ -196,37 +245,26 @@ public class SecantMethodController {
         chart.setTitle("Función: " + equation);
         chart.setLegendVisible(false);
         
-        // Habilitar desplazamiento para zoom
+        // Configurar zoom y desplazamiento
         chart.setAnimated(false);
         final double[] xOffset = new double[1];
         final double[] yOffset = new double[1];
         
-        // Manejar scroll para zoom
         chart.setOnScroll(event -> {
             double zoomFactor = 1.05;
-            if (event.getDeltaY() < 0) {
-                zoomFactor = 0.95;
-            }
+            if (event.getDeltaY() < 0) zoomFactor = 0.95;
             
-            // Calcular nuevos rangos
             double xMin = xAxis.getLowerBound();
             double xMax = xAxis.getUpperBound();
             double yMin = yAxis.getLowerBound();
             double yMax = yAxis.getUpperBound();
             
-            // Obtener posición del mouse
             double mouseX = event.getX();
             double mouseY = event.getY();
             
-            // Convertir a valores de los ejes
             double xValue = xAxis.getValueForDisplay(mouseX).doubleValue();
             double yValue = yAxis.getValueForDisplay(mouseY).doubleValue();
             
-            // Calcular nuevos límites
-            double newXLength = (xMax - xMin) * zoomFactor;
-            double newYLength = (yMax - yMin) * zoomFactor;
-            
-            // Aplicar zoom manteniendo posición del mouse fija
             xAxis.setLowerBound(xValue - (xValue - xMin) * zoomFactor);
             xAxis.setUpperBound(xValue + (xMax - xValue) * zoomFactor);
             yAxis.setLowerBound(yValue - (yValue - yMin) * zoomFactor);
@@ -235,7 +273,6 @@ public class SecantMethodController {
             event.consume();
         });
         
-        // Manejar arrastre para pan
         chart.setOnMousePressed(event -> {
             xOffset[0] = event.getX();
             yOffset[0] = event.getY();
@@ -257,14 +294,14 @@ public class SecantMethodController {
             yOffset[0] = event.getY();
             event.consume();
         });
-    
+
         XYChart.Series<Number, Number> functionSeries = new XYChart.Series<>();
         
         try {
             Expression expr = new ExpressionBuilder(equation)
                     .variable("x")
                     .build();
-    
+
             for (double x = -10; x <= 10; x += 0.1) {
                 try {
                     double y = evaluate(expr, x);
