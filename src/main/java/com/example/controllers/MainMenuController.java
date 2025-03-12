@@ -36,7 +36,7 @@ public class MainMenuController {
             newRapMulBTN.setOnAction(e -> new NewtonRapsonMulti().show());
 
             // Agregar más botones para otros métodos
-            root.getChildren().addAll(secantBtn, gaussBtn);
+            root.getChildren().addAll(secantBtn, gaussBtn, newRapMulBTN);
 
             Scene scene = new Scene(root, 400, 300);
             scene.getStylesheets().add(getClass().getResource("/styles.css").toExternalForm());
