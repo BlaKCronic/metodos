@@ -32,6 +32,9 @@ public class MainMenuController {
             Button jacoBtn = createMethodButton("Método de Jacobi");
             jacoBtn.setOnAction(e -> new JacobiMethodController().show());
 
+            Button newRapMulBTN = createMethodButton("Metodo de Newton Rapson Multivariable");
+            newRapMulBTN.setOnAction(e -> new NewtonRapsonMulti().show());
+
             // Agregar más botones para otros métodos
             root.getChildren().addAll(secantBtn, gaussBtn);
 
