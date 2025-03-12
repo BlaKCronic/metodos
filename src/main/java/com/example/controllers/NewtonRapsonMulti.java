@@ -313,7 +313,7 @@ public class NewtonRapsonMulti {
                 throw new ArithmeticException("El Jacobiano es singular o mal condicionado en x=" + x + ", y=" + y);
             }
             
-            // 4. Calcular los incrementos Δx y Δy según las fórmulas del PDF
+            // 4. Calcular los incrementos Δx y Δy
             deltaX = (-f1Val * df2dy + f2Val * df1dy) / det;
             deltaY = (-f2Val * df1dx + f1Val * df2dx) / det;
             
@@ -385,7 +385,6 @@ public class NewtonRapsonMulti {
     }
 
     private void loadExample() {
-        // Cargar el ejemplo del PDF
         f1Field.setText("x + 3*log(x) - y^2");
         f2Field.setText("2*x^2 - x*y - 5*x + 1");
         x0Field.setText("2");
