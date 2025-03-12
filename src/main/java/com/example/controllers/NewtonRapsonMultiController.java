@@ -18,7 +18,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NewtonRapsonMulti {
+public class NewtonRapsonMultiController {
     private static final DecimalFormat df = new DecimalFormat("0.000000");
     private TextField f1Field;
     private TextField f2Field;

@@ -33,10 +33,10 @@ public class MainMenuController {
             jacoBtn.setOnAction(e -> new JacobiMethodController().show());
 
             Button newRapMulBTN = createMethodButton("Metodo de Newton Rapson Multivariable");
-            newRapMulBTN.setOnAction(e -> new NewtonRapsonMulti().show());
+            newRapMulBTN.setOnAction(e -> new NewtonRapsonMultiController().show());
 
             // Agregar más botones para otros métodos
-            root.getChildren().addAll(secantBtn, gaussBtn, biseBtn, jacoBtn);
+            root.getChildren().addAll(secantBtn, gaussBtn, biseBtn, jacoBtn, newRapMulBTN);
 
             Scene scene = new Scene(root, 400, 300);
             scene.getStylesheets().add(getClass().getResource("/styles.css").toExternalForm());
