@@ -188,13 +188,16 @@ public class JacobiMethodController {
             table.getColumns().add(xCol);
         }
         
-        // Columna para el error
-        TableColumn<List<String>, String> errorCol = new TableColumn<>("Error");
-        errorCol.setCellValueFactory(data -> new javafx.beans.property.SimpleStringProperty(
-            data.getValue().get(systemSize + 1)
-        ));
-        errorCol.setPrefWidth(100);
-        table.getColumns().add(errorCol);
+        // Columnas para los errores individuales de cada ecuación
+        for (int i = 0; i < systemSize; i++) {
+            final int idx = i + 1;
+            TableColumn<List<String>, String> errorCol = new TableColumn<>("Error Ec." + idx);
+            errorCol.setCellValueFactory(data -> new javafx.beans.property.SimpleStringProperty(
+                data.getValue().get(systemSize + idx)
+            ));
+            errorCol.setPrefWidth(100);
+            table.getColumns().add(errorCol);
+        }
         
         return table;
     }
@@ -349,10 +352,11 @@ public class JacobiMethodController {
         int n = A.length;
         double[] x = new double[n];      // Nueva aproximación
         double[] xPrev = x0.clone();     // Aproximación anterior
-        double error = 1.0;
+        double[] errors = new double[n]; // Error para cada ecuación
+        boolean converged = false;
         int iter = 0;
         
-        while (error > tol) {
+        while (!converged && iter < 1000) { // Añadimos límite de iteraciones para evitar bucles infinitos
             // Calcular la nueva aproximación
             for (int i = 0; i < n; i++) {
                 double sum = 0;
@@ -369,22 +373,30 @@ public class JacobiMethodController {
                 x[i] = (b[i] - sum) / A[i][i];
             }
             
-            // Calcular el error (norma del vector diferencia)
-            error = 0;
+            // Calcular los errores para cada ecuación
+            converged = true;
             for (int i = 0; i < n; i++) {
-                error += Math.pow(x[i] - xPrev[i], 2);
+                errors[i] = Math.abs(x[i] - xPrev[i]);
+                // Verificar si todos los errores son menores que la tolerancia
+                if (errors[i] > tol) {
+                    converged = false;
+                }
             }
-            error = Math.sqrt(error);
             
             // Registrar esta iteración
             List<String> row = new ArrayList<>();
             row.add(String.valueOf(iter + 1));
             
+            // Añadir los valores de x
             for (int i = 0; i < n; i++) {
                 row.add(df.format(x[i]));
             }
             
-            row.add(df.format(error));
+            // Añadir los errores individuales
+            for (int i = 0; i < n; i++) {
+                row.add(df.format(errors[i]));
+            }
+            
             steps.add(row);
             
             // Actualizar xPrev para la siguiente iteración
