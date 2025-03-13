@@ -178,7 +178,7 @@ public class SecantMethodController {
         
         x0Field.setPromptText("Xi-1 inicial");
         x1Field.setPromptText("Xi inicial");
-        tolField.setPromptText("Tolerancia (1e-6)");
+        tolField.setPromptText("Tolerancia (0.001)");
         
         grid.addRow(0, new Label("Valor inicial Xi-1:"), x0Field);
         grid.addRow(1, new Label("Valor inicial Xi:"), x1Field);
