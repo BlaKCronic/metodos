@@ -156,8 +156,7 @@ public class NewtonRapsonMultiController {
     private TableView<List<String>> createResultsTable() {
         TableView<List<String>> table = new TableView<>();
         
-        String[] columns = {"Iter", "xᵢ", "yᵢ", "f₁(xᵢ,yᵢ)", "f₂(xᵢ,yᵢ)", "∂f₁/∂x", "∂f₁/∂y", "∂f₂/∂x", "∂f₂/∂y", "Δx", "Δy", "Error x", "Error y"};
-        
+        String[] columns = {"Iter", "xᵢ", "yᵢ", "f₁(xᵢ,yᵢ)", "f₂(xᵢ,yᵢ)", "∂f₁/∂x", "∂f₁/∂y", "∂f₂/∂x", "∂f₂/∂y", "Δx", "Δy", "xᵢ₊₁", "yᵢ₊₁", "Error x", "Error y"};        
         for (int i = 0; i < columns.length; i++) {
             final int columnIndex = i;
             TableColumn<List<String>, String> column = new TableColumn<>(columns[i]);
@@ -321,9 +320,18 @@ public class NewtonRapsonMultiController {
             xNew = x + deltaX;
             yNew = y + deltaY;
             
-            // 6. Calcular los errores (usando el error relativo cuando sea posible)
-            errorX = Math.abs(deltaX);
-            errorY = Math.abs(deltaY);
+            // 6. Calcular los errores (usando el error relativo porcentual)
+            if (Math.abs(xNew) > 1e-10) { // Evitar división por cero
+                errorX = Math.abs((xNew - x) / xNew) * 100;
+            } else {
+                errorX = Math.abs(deltaX);
+            }
+            
+            if (Math.abs(yNew) > 1e-10) { // Evitar división por cero
+                errorY = Math.abs((yNew - y) / yNew) * 100;
+            } else {
+                errorY = Math.abs(deltaY);
+            }
             
             // 7. Agregar esta iteración a la tabla de resultados
             List<String> row = new ArrayList<>();
@@ -338,8 +346,10 @@ public class NewtonRapsonMultiController {
             row.add(df.format(df2dy));   // ∂f₂/∂y
             row.add(df.format(deltaX));  // Δx
             row.add(df.format(deltaY));  // Δy
-            row.add(df.format(errorX));  // Error x
-            row.add(df.format(errorY));  // Error y
+            row.add(df.format(xNew));    // xᵢ₊₁
+            row.add(df.format(yNew));    // yᵢ₊₁
+            row.add(df.format(errorX));  // Error x (%)
+            row.add(df.format(errorY));  // Error y (%)
             steps.add(row);
             
             // 8. Actualizar x e y para la siguiente iteración
