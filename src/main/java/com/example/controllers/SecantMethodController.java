@@ -120,9 +120,10 @@ public class SecantMethodController {
         String[][] buttons = {
             {"sin(", "cos(", "tan(", "√(", "π", "e"},
             {"log(", "ln(", "^", "(", ")", "abs("},
-            {"7", "8", "9", "+", "-", "←"},
-            {"4", "5", "6", "*", "/", "C"},
-            {"1", "2", "3", ".", "x", "="}
+            {"asin(", "acos(", "atan(", "+", "-", "←"},
+            {"7", "8", "9", "*", "/", "C"},
+            {"4", "5", "6", ".", "x", "="},
+            {"1", "2", "3", "0", ",", "arcsen("}
         };
 
         for (int row = 0; row < buttons.length; row++) {
@@ -138,7 +139,7 @@ public class SecantMethodController {
         Button btn = new Button(text);
         btn.getStyleClass().addAll("key-btn", 
             text.matches("[+\\-*/^=]") ? "operator-key" : 
-            text.matches("[a-zA-Z]+") ? "function-key" : "number-key");
+            text.matches("[a-zA-Z]+\\(?") ? "function-key" : "number-key");
         
         btn.setOnAction(e -> handleKeyboardInput(text));
         return btn;
@@ -161,6 +162,9 @@ public class SecantMethodController {
                 break;
             case "√(": 
                 equationField.setText(current + "sqrt(");
+                break;
+            case "arcsen(":
+                equationField.setText(current + "asin(");
                 break;
             default: 
                 equationField.setText(current + key);
@@ -241,6 +245,9 @@ public class SecantMethodController {
 
             validateInputs(x0Field, x1Field, tolField);
             currentEquation = equationField.getText();
+            
+            // Reemplazar "arcsen(" por "asin(" para compatibilidad con exp4j
+            currentEquation = currentEquation.replace("arcsen(", "asin(");
             
             performSecantMethod(
                 currentEquation,

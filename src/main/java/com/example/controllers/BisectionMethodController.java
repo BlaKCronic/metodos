@@ -82,7 +82,7 @@ public class BisectionMethodController {
         
         Button btnGraph = new Button("Mostrar Gráfica");
         btnGraph.getStyleClass().add("graph-btn");
-        btnGraph.setDisable(true);
+        // El botón ya no estará deshabilitado
         
         Button btnClear = new Button("Limpiar");
         btnClear.getStyleClass().add("graph-btn");
@@ -125,13 +125,35 @@ public class BisectionMethodController {
                 validateInputs();
                 currentEquation = equationField.getText();
                 performBisectionMethod();
-                btnGraph.setDisable(false);
+                // Eliminamos la línea que habilita el botón aquí
             } catch (Exception ex) {
                 showErrorDialog("Error de entrada", ex.getMessage());
             }
         });
         
-        btnGraph.setOnAction(e -> showGraphWindow());
+        btnGraph.setOnAction(e -> {
+            try {
+                // Antes de mostrar la gráfica, validamos que haya una ecuación
+                if (equationField.getText().isBlank()) {
+                    throw new IllegalArgumentException("Debe ingresar una función para graficar");
+                }
+                
+                // Actualizamos la ecuación actual
+                currentEquation = equationField.getText();
+                
+                // Si los campos a y b están vacíos, asignamos valores predeterminados
+                if (aField.getText().isBlank()) {
+                    aField.setText("-10");
+                }
+                if (bField.getText().isBlank()) {
+                    bField.setText("10");
+                }
+                
+                showGraphWindow();
+            } catch (Exception ex) {
+                showErrorDialog("Error de gráfica", ex.getMessage());
+            }
+        });
 
         return panel;
     }
@@ -413,25 +435,38 @@ public class BisectionMethodController {
     }
 
     private LineChart<Number, Number> createChart(String equation) {
-        // Obtener los límites a y b para establecer mejor el rango del gráfico
-        double a = Double.parseDouble(aField.getText());
-        double b = Double.parseDouble(bField.getText());
-        double range = Math.abs(b - a);
-        double padding = range * 0.5; // Añadir espacio adicional a cada lado
-        
-        NumberAxis xAxis = new NumberAxis(a - padding, b + padding, range / 10);
-        NumberAxis yAxis = new NumberAxis();
-        xAxis.setLabel("x");
-        yAxis.setLabel("f(x)");
-        
-        LineChart<Number, Number> chart = new LineChart<>(xAxis, yAxis);
-        chart.setTitle("Función: f(x) = " + equation);
-        
-        XYChart.Series<Number, Number> series = new XYChart.Series<>();
-        series.setName("f(x) = " + equation);
-
         try {
-            Expression expr = new ExpressionBuilder(equation).variable("x").build();
+            // Obtener los valores de a y b, con manejo mejorado de casos donde no hay cálculo previo
+            double a, b;
+            try {
+                a = Double.parseDouble(aField.getText());
+                b = Double.parseDouble(bField.getText());
+            } catch (NumberFormatException e) {
+                // Valores predeterminados si no hay entrada válida
+                a = -10;
+                b = 10;
+            }
+            
+            double range = Math.abs(b - a);
+            double padding = range * 0.5; // Añadir espacio adicional a cada lado
+            
+            NumberAxis xAxis = new NumberAxis(a - padding, b + padding, range / 10);
+            NumberAxis yAxis = new NumberAxis();
+            xAxis.setLabel("x");
+            yAxis.setLabel("f(x)");
+            
+            LineChart<Number, Number> chart = new LineChart<>(xAxis, yAxis);
+            chart.setTitle("Función: f(x) = " + equation);
+            
+            XYChart.Series<Number, Number> series = new XYChart.Series<>();
+            series.setName("f(x) = " + equation);
+    
+            Expression expr = new ExpressionBuilder(equation)
+                .variable("x")
+                .build()
+                .setVariable("π", Math.PI)
+                .setVariable("e", Math.E);
+                
             double step = range / 100;
             for (double x = a - padding; x <= b + padding; x += step) {
                 try {
@@ -440,30 +475,37 @@ public class BisectionMethodController {
                     if (y > -1000 && y < 1000) {
                         series.getData().add(new XYChart.Data<>(x, y));
                     }
-                } catch (ArithmeticException e) { /* Ignorar puntos inválidos */ }
+                } catch (ArithmeticException ex) { /* Ignorar puntos inválidos */ }
             }
+            
+            chart.getData().add(series);
+            
+            // Añadir serie para la raíz encontrada, solo si hay un resultado calculado
+            if (resultField.getText() != null && !resultField.getText().isEmpty() 
+                    && !resultField.getText().equals("No converge")) {
+                XYChart.Series<Number, Number> rootSeries = new XYChart.Series<>();
+                rootSeries.setName("Raíz");
+                try {
+                    double root = Double.parseDouble(resultField.getText().replace(",", "."));
+                    rootSeries.getData().add(new XYChart.Data<>(root, 0));
+                    chart.getData().add(rootSeries);
+                    
+                    // Estilizar el punto de la raíz
+                    rootSeries.getData().get(0).getNode().setStyle("-fx-background-color: red; -fx-background-radius: 5px;");
+                } catch (Exception e) {
+                    // Si no se puede convertir el valor, ignorar
+                }
+            }
+            
+            return chart;
         } catch (Exception e) {
-            showErrorDialog("Error gráfico", "No se puede graficar la función");
+            // Si hay algún error al crear el gráfico, mostrar un gráfico vacío con un mensaje
+            NumberAxis xAxis = new NumberAxis(-10, 10, 1);
+            NumberAxis yAxis = new NumberAxis();
+            LineChart<Number, Number> chart = new LineChart<>(xAxis, yAxis);
+            chart.setTitle("Error al graficar la función: " + e.getMessage());
+            return chart;
         }
-        
-        // Añadir serie para la raíz encontrada
-        XYChart.Series<Number, Number> rootSeries = new XYChart.Series<>();
-        rootSeries.setName("Raíz");
-        try {
-            double root = Double.parseDouble(resultField.getText().replace(",", "."));
-            rootSeries.getData().add(new XYChart.Data<>(root, 0));
-        } catch (Exception e) {
-            // Si no se puede convertir el valor, ignorar
-        }
-        
-        chart.getData().addAll(series, rootSeries);
-        
-        // Estilizar el punto de la raíz
-        if (!rootSeries.getData().isEmpty()) {
-            rootSeries.getData().get(0).getNode().setStyle("-fx-background-color: red; -fx-background-radius: 5px;");
-        }
-        
-        return chart;
     }
 
     private void clearInputs() {

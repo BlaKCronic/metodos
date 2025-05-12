@@ -224,7 +224,7 @@ public class JacobiMethodController {
             "1) Despejar cada variable xᵢ en términos de las demás variables.\n" +
             "2) Establecer valores iniciales para todas las variables (por defecto cero).\n" +
             "3) Usando los valores actuales, calcular nuevos valores para cada variable.\n" +
-            "4) Calcular el error entre las aproximaciones sucesivas.\n" +
+            "4) Calcular el error: residuo o la diferencia normalizada entre iteraciones sucesivas.\n" +
             "5) Repetir hasta que el error sea menor que la tolerancia especificada.\n\n" +
             "Ventajas:\n" +
             "• Fácil de implementar\n" +
@@ -373,10 +373,19 @@ public class JacobiMethodController {
                 x[i] = (b[i] - sum) / A[i][i];
             }
             
-            // Calcular los errores para cada ecuación
+            // Calcular los errores como residuos para cada ecuación
             converged = true;
             for (int i = 0; i < n; i++) {
-                errors[i] = Math.abs(x[i] - xPrev[i]);
+                // Calcular el residuo de cada ecuación: |Ax - b|
+                double residual = 0;
+                for (int j = 0; j < n; j++) {
+                    residual += A[i][j] * x[j];
+                }
+                residual = Math.abs(residual - b[i]);
+                
+                // Asignar el residuo como error
+                errors[i] = residual;
+                
                 // Verificar si todos los errores son menores que la tolerancia
                 if (errors[i] > tol) {
                     converged = false;
@@ -392,7 +401,7 @@ public class JacobiMethodController {
                 row.add(df.format(x[i]));
             }
             
-            // Añadir los errores individuales
+            // Añadir los errores individuales (residuos) 
             for (int i = 0; i < n; i++) {
                 row.add(df.format(errors[i]));
             }
