@@ -38,10 +38,29 @@ public class MainMenuController {
             Button reMulBTN = createMethodButton("Metodo de regresion multiple");
             reMulBTN.setOnAction(e -> new RegresionMultipleController().show());
 
-            // Agregar más botones para otros métodos
-            root.getChildren().addAll(secantBtn, gaussBtn, biseBtn, jacoBtn, newRapMulBTN, reMulBTN);
+            Button linarIn = createMethodButton("Metodo de interpolacion lineal");
+            linarIn.setOnAction(e -> new LinearInterpolationController().show());
 
-            Scene scene = new Scene(root, 400, 300);
+            Button NewInter = createMethodButton("Metodo de interpolacion divididas Newton");
+            NewInter.setOnAction(e -> new NewtonInterpolationController().show());
+
+            Button exitBtn = createMethodButton("Salir");
+            exitBtn.setOnAction(e -> {
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Confirmar Salida");
+                alert.setHeaderText("¿Está seguro de que desea salir?");
+                alert.setContentText("Esta acción no se puede deshacer.");
+                alert.showAndWait().ifPresent(response -> {
+                    if (response.getButtonData().isDefaultButton()) {
+                        stage.close();
+                    }
+                });
+            });
+
+            // Agregar más botones para otros métodos
+            root.getChildren().addAll(secantBtn, gaussBtn, biseBtn, jacoBtn, newRapMulBTN, reMulBTN, linarIn, NewInter, exitBtn);
+
+            Scene scene = new Scene(root, 400, 500);
             scene.getStylesheets().add(getClass().getResource("/styles.css").toExternalForm());
             stage.setScene(scene);
             stage.show();
